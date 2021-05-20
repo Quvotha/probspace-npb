@@ -40,16 +40,18 @@ class Hand(object):
     RIGHT = 0
 
     @classmethod
-    def impute_pitcher_hand(cls, pitchers: pd.DataFrame) -> dict:
-        impute_values = {}
-        nan_mask = pitchers.pitcherHand.apply(lambda x: isinstance(x, float))
-        for id_ in pitchers[nan_mask].pitcherID.unique():
-            hand = pitchers.query(f'pitcherID == {id_}').dropna().pitcherHand.mode()[0]
-            impute_values[id_] = cls.LEFT if hand == 'L' else cls.RIGHT
-        return impute_values
+    def is_pitcher_hand_left(cls, pitchers: pd.DataFrame) -> pd.Series:
+        pitcher_ids = pitchers.pitcherID.unique()
+        mode_list = [
+            cls.LEFT
+            if pitchers.query(f'pitcherID == {id_}').pitcherHand.mode()[0] == 'L' else cls.RIGHT
+            for id_ in pitcher_ids]
+        most_frequent_hand = dict(zip(pitcher_ids, mode_list))
+        return pitchers.pitcherID.apply(
+            lambda id_: most_frequent_hand[id_]).rename('isPitcherHandLeft')
 
     @classmethod
-    def impute_batter_hand(cls, batters: pd.DataFrame) -> pd.Series:
+    def is_batter_hand_left(cls, batters: pd.DataFrame) -> pd.Series:
 
         def _impute_batter_hand(
                 s: pd.Series,
@@ -74,4 +76,4 @@ class Hand(object):
             most_frequent_hand=most_frequent_hand,
             left=cls.LEFT,
             right=cls.RIGHT)
-        return batters.apply(impute_func, axis=1)
+        return batters.apply(impute_func, axis=1).rename('isBatterHandLeft')

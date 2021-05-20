@@ -61,8 +61,8 @@ class TestHand(unittest.TestCase):
         """テストデータ：
         1. 右投げ、欠損は0埋
         2. 左投げ、欠損は1埋
-        3. 右投げ、欠損が無いのでキーに含まれず
-        4. 左投げ、欠損が無いのでキーに含まれず
+        3. 右投げ、0
+        4. 左投げ、0
         """
         input_ = pd.DataFrame({
             'pitcherID': [
@@ -72,15 +72,20 @@ class TestHand(unittest.TestCase):
                 4, 4, 4
             ],
             'pitcherHand': [
-                'R', np.nan, np.nan,
-                np.nan, 'L', 'L',
-                'R', 'R', 'R',
-                'L', 'L', 'L',
+                'R',    np.nan, np.nan,
+                np.nan, 'L',    'L',
+                'R',    'R',    'R',
+                'L',    'L',    'L',
             ]
         })
-        expected = {1: 0, 2: 1}
-        output = Hand.impute_pitcher_hand(input_)
-        self.assertEqual(output, expected)
+        expected = pd.Series([
+            0, 0, 0,
+            1, 1, 1,
+            0, 0, 0,
+            1, 1, 1,
+        ])
+        output = Hand.is_pitcher_hand_left(input_)
+        self.assertTrue(pd.testing.assert_series_equal(output, expected, check_names=False) is None)
 
     def test_impute_batter_hand(self):
         """テストデータ：
@@ -125,8 +130,8 @@ class TestHand(unittest.TestCase):
             1, 1, 1, 1,
             1, 0, 1, 0,
         ])
-        output = Hand.impute_batter_hand(input_)
-        self.assertTrue(pd.testing.assert_series_equal(output, expected) is None)
+        output = Hand.is_batter_hand_left(input_)
+        self.assertTrue(pd.testing.assert_series_equal(output, expected, check_names=False) is None)
 
 
 if __name__ == '__main__':
