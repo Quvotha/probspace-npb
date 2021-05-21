@@ -77,3 +77,38 @@ class Hand(object):
             left=cls.LEFT,
             right=cls.RIGHT)
         return batters.apply(impute_func, axis=1).rename('isBatterHandLeft')
+
+
+class GameParticipation(object):
+
+    def __init__(self, data: pd.DataFrame):
+        self.data = data[['gameID', 'startDayTime', 'pitcherID', 'batterID']]
+
+    def hours_elapsed_from_last(self, calc_pitcher: bool = True) -> pd.DataFrame:
+        if calc_pitcher:
+            data = self.data[['gameID', 'startDayTime', 'pitcherID']] \
+                .rename(columns={'pitcherID': 'playerID'})
+        else:
+            data = self.data[['gameID', 'startDayTime', 'batterID']] \
+                .rename(columns={'batterID': 'playerID'})
+        data = data.drop_duplicates(subset=['gameID', 'playerID'])
+        data['startDayTime'] = pd.to_datetime(data.startDayTime)
+        # calculate interval by `playerID`
+        list_startdaytime = []
+        sec_to_hour = 3600
+        for _, player_df in data.groupby('playerID'):
+            player_df.sort_values('startDayTime', inplace=True)
+            player_df['Previous'] = player_df.startDayTime.shift(1)
+            player_df['Delta'] = player_df.startDayTime - player_df.Previous
+            player_df['hoursElapsed'] = player_df.Delta.apply(
+                lambda x: x.total_seconds() / sec_to_hour)
+            list_startdaytime.append(player_df)
+        out_df = pd.concat(list_startdaytime) \
+            .sort_values(['playerID', 'gameID']) \
+            .loc[:, ['playerID', 'gameID', 'hoursElapsed']] \
+            .reset_index(drop=True)
+        if calc_pitcher:
+            out_df.rename(columns={'playerID': 'pitcherID'}, inplace=True)
+        else:
+            out_df.rename(columns={'playerID': 'batterID'}, inplace=True)
+        return out_df

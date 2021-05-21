@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from players import Players, Hand
+from players import Players, Hand, GameParticipation
 
 
 class TestAssignPlayerID(unittest.TestCase):
@@ -85,7 +85,7 @@ class TestHand(unittest.TestCase):
             1, 1, 1,
         ])
         output = Hand.is_pitcher_hand_left(input_)
-        self.assertTrue(pd.testing.assert_series_equal(output, expected, check_names=False) is None)
+        self.assertIsNone(pd.testing.assert_series_equal(output, expected, check_names=False))
 
     def test_impute_batter_hand(self):
         """テストデータ：
@@ -131,7 +131,107 @@ class TestHand(unittest.TestCase):
             1, 0, 1, 0,
         ])
         output = Hand.is_batter_hand_left(input_)
-        self.assertTrue(pd.testing.assert_series_equal(output, expected, check_names=False) is None)
+        self.assertIsNone(pd.testing.assert_series_equal(output, expected, check_names=False))
+
+
+class TestGameParticipant(unittest.TestCase):
+
+    def test_paased_time_from_last_participation(self):
+        """
+        1試合だけ
+        全て
+        一部の試合
+        投手と打者
+        1. 試合
+        """
+        input_ = pd.DataFrame({
+            'gameID': [
+                1, 1, 1, 1,
+                2, 2, 2, 2,
+                3, 3, 3, 3,
+            ],
+            'startDayTime': [
+                '2020-05-01 10:00:00', '2020-05-01 10:00:00', '2020-05-01 10:00:00', '2020-05-01 10:00:00',
+                '2020-05-02 10:00:00', '2020-05-02 10:00:00', '2020-05-02 10:00:00', '2020-05-02 10:00:00',
+                '2020-05-04 18:00:00', '2020-05-04 18:00:00', '2020-05-04 18:00:00', '2020-05-04 18:00:00',
+            ],
+            'pitcherID': [
+                1, 2, 3, 5,
+                1, 2, 4, 6,
+                1, 3, 4, 7,
+            ],
+            'batterID': [
+                10, 20, 30, 50,
+                10, 20, 40, 60,
+                10, 30, 40, 70,
+            ],
+        })
+        input_['startDayTime'] = pd.to_datetime(input_['startDayTime'])
+        game_participation = GameParticipation(data=input_)
+        # pitcher
+        expected = pd.DataFrame({
+            'pitcherID': [
+                1, 1, 1,
+                2, 2,
+                3, 3,
+                4, 4,
+                5,
+                6,
+                7,
+            ],
+            'gameID': [
+                1, 2, 3,
+                1, 2,
+                1, 3,
+                2, 3,
+                1,
+                2,
+                3,
+            ],
+            'hoursElapsed': [
+                np.nan, 24, 56,
+                np.nan, 24,
+                np.nan, 80,
+                np.nan, 56,
+                np.nan,
+                np.nan,
+                np.nan,
+            ]
+        })
+        output = game_participation.hours_elapsed_from_last(calc_pitcher=True)
+        self.assertIsNone(pd.testing.assert_frame_equal(expected, output))
+        # batter
+        expected = pd.DataFrame({
+            'batterID': [
+                10, 10, 10,
+                20, 20,
+                30, 30,
+                40, 40,
+                50,
+                60,
+                70,
+            ],
+            'gameID': [
+                1, 2, 3,
+                1, 2,
+                1, 3,
+                2, 3,
+                1,
+                2,
+                3,
+            ],
+            'hoursElapsed': [
+                np.nan, 24, 56,
+                np.nan, 24,
+                np.nan, 80,
+                np.nan, 56,
+                np.nan,
+                np.nan,
+                np.nan,
+            ]
+        })
+        output = game_participation.hours_elapsed_from_last(calc_pitcher=False)
+        self.assertIsNone(pd.testing.assert_frame_equal(expected, output))
 
 
 if __name__ == '__main__':
