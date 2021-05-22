@@ -137,13 +137,6 @@ class TestHand(unittest.TestCase):
 class TestGameParticipant(unittest.TestCase):
 
     def test_paased_time_from_last_participation(self):
-        """
-        1試合だけ
-        全て
-        一部の試合
-        投手と打者
-        1. 試合
-        """
         input_ = pd.DataFrame({
             'gameID': [
                 1, 1, 1, 1,

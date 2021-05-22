@@ -47,8 +47,10 @@ class Hand(object):
             if pitchers.query(f'pitcherID == {id_}').pitcherHand.mode()[0] == 'L' else cls.RIGHT
             for id_ in pitcher_ids]
         most_frequent_hand = dict(zip(pitcher_ids, mode_list))
-        return pitchers.pitcherID.apply(
-            lambda id_: most_frequent_hand[id_]).rename('isPitcherHandLeft')
+        return pitchers \
+            .pitcherID \
+            .apply(lambda id_: most_frequent_hand[id_]) \
+            .rename('isPitcherHandLeft')
 
     @classmethod
     def is_batter_hand_left(cls, batters: pd.DataFrame) -> pd.Series:
@@ -100,8 +102,9 @@ class GameParticipation(object):
             player_df.sort_values('startDayTime', inplace=True)
             player_df['Previous'] = player_df.startDayTime.shift(1)
             player_df['Delta'] = player_df.startDayTime - player_df.Previous
-            player_df['hoursElapsed'] = player_df.Delta.apply(
-                lambda x: x.total_seconds() / sec_to_hour)
+            player_df['hoursElapsed'] = player_df \
+                .Delta \
+                .apply(lambda x: x.total_seconds() / sec_to_hour)
             list_startdaytime.append(player_df)
         out_df = pd.concat(list_startdaytime) \
             .sort_values(['playerID', 'gameID']) \
