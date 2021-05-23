@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-class Players(object):
+class PlayersID(object):
 
     # These players belonged to 2 teams in 2020s.
     # https://prob.space/competitions/npb/discussions/Quvotha-nndropout100-Post996ddd42670380ebceb5
@@ -14,7 +14,7 @@ class Players(object):
         self.pitchers = pitchers[['pitcher', 'pitcherTeam']]
         self.batters = batters[['batter', 'batterTeam']]
 
-    def assign_id(self) -> pd.DataFrame:
+    def assign(self) -> pd.DataFrame:
         # Create players list (1 row = 1 player, team)
         player_id = pd.DataFrame({
             'player': pd.concat([self.pitchers.pitcher, self.batters.batter]),

@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from players import Players, Hand, GameParticipation
+from players import PlayersID, Hand, GameParticipation
 
 
 class TestAssignPlayerID(unittest.TestCase):
@@ -20,8 +20,8 @@ class TestAssignPlayerID(unittest.TestCase):
             'batter': ['C', 'D', 'E', 'F', 'F'],
             'batterTeam': [3, 3, 4, 4, 5]
         })
-        players = Players(pitchers=pitchers, batters=batters)
-        output = players.assign_id()
+        playersid = PlayersID(pitchers=pitchers, batters=batters)
+        output = playersid.assign()
         # playerID, player, team
         self.assertTrue('playerID' in output.columns)
         self.assertTrue('player' in output.columns)
@@ -44,12 +44,12 @@ class TestAssignPlayerID(unittest.TestCase):
             'batter': ['C', 'D', 'E', 'F', 'F', '澤村 拓一', '澤村 拓一', '小林 慶祐'],
             'batterTeam': [3, 3, 4, 4, 5, 7, 8, 12]
         })
-        players = Players(pitchers=pitchers, batters=batters)
-        output = players.assign_id()
+        playersid = PlayersID(pitchers=pitchers, batters=batters)
+        output = playersid.assign()
         # There are 10 players (A, B, C, D, E, F(Team4), F(Team5), 'ＤＪ．ジョンソン', '澤村 拓一', '小林 慶祐')
         self.assertEqual(output.shape[0], 13)  # Last 3 players have 2 rows, others(7) 1 row
         self.assertEqual(output.playerID.nunique(), 10)  # 10 players
-        for p in Players.TRANSFERRED_PLAYERS:
+        for p in PlayersID.TRANSFERRED_PLAYERS:
             rows = output.query(f'player == "{p}"')
             self.assertEqual(rows.shape[0], 2)  # 2 rows
             self.assertEqual(rows.playerID.nunique(), 1)  # only 1 ID
