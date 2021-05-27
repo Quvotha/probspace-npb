@@ -105,10 +105,11 @@ class GameParticipation(object):
             player_df['hoursElapsed'] = player_df \
                 .Delta \
                 .apply(lambda x: x.total_seconds() / sec_to_hour)
+            player_df['numGamesParticipated'] = player_df.reset_index().index + 1
             list_startdaytime.append(player_df)
         out_df = pd.concat(list_startdaytime) \
             .sort_values(['playerID', 'gameID']) \
-            .loc[:, ['playerID', 'gameID', 'hoursElapsed']] \
+            .loc[:, ['playerID', 'gameID', 'hoursElapsed', 'numGamesParticipated']] \
             .reset_index(drop=True)
         if calc_pitcher:
             out_df.rename(columns={'playerID': 'pitcherID'}, inplace=True)

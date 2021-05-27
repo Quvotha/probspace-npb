@@ -189,6 +189,15 @@ class TestGameParticipant(unittest.TestCase):
                 np.nan,
                 np.nan,
                 np.nan,
+            ],
+            'numGamesParticipated': [
+                1, 2, 3,
+                1, 2,
+                1, 2,
+                1, 2,
+                1,
+                1,
+                1,
             ]
         })
         output = game_participation.hours_elapsed_from_last(calc_pitcher=True)
@@ -221,6 +230,15 @@ class TestGameParticipant(unittest.TestCase):
                 np.nan,
                 np.nan,
                 np.nan,
+            ],
+            'numGamesParticipated': [
+                1, 2, 3,
+                1, 2,
+                1, 2,
+                1, 2,
+                1,
+                1,
+                1,
             ]
         })
         output = game_participation.hours_elapsed_from_last(calc_pitcher=False)
