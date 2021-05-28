@@ -1,4 +1,5 @@
 from functools import partial
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -6,8 +7,10 @@ import pandas as pd
 
 class PlayersID(object):
 
-    # These players belonged to 2 teams in 2020s.
-    # https://prob.space/competitions/npb/discussions/Quvotha-nndropout100-Post996ddd42670380ebceb5
+    '''
+    These players belonged to 2 teams in 2020s.
+    https://prob.space/competitions/npb/discussions/Quvotha-nndropout100-Post996ddd42670380ebceb5
+    '''
     TRANSFERRED_PLAYERS = ('ＤＪ．ジョンソン', '澤村 拓一', '小林 慶祐')
 
     def __init__(self, pitchers: pd.DataFrame, batters: pd.DataFrame):
@@ -15,6 +18,13 @@ class PlayersID(object):
         self.batters = batters[['batter', 'batterTeam']]
 
     def assign(self) -> pd.DataFrame:
+        """Assign identifier for all players.
+
+        Returns
+        -------
+        player_ids: pd.DataFrame
+            Having 3 columns, `playerID`, `player`, and `team`.
+        """
         # Create players list (1 row = 1 player, team)
         player_id = pd.DataFrame({
             'player': pd.concat([self.pitchers.pitcher, self.batters.batter]),
@@ -33,6 +43,30 @@ class PlayersID(object):
             else:
                 player_id.loc[player_mask, 'playerID'] = one_id
         return player_id
+
+    @staticmethod
+    def compare_2_ids(ids_train: pd.Series, ids_test: pd.Series) -> Tuple[List]:
+        """Identify which id appears both in train and test set, or dose in only one of them.
+
+        Parameters
+        ----------
+        ids_trian : pd.Series
+            All of the playerIDs which appear in train set.
+        ids_test : pd.Series
+            All of the playerIDs which appear in test set.
+
+        Returns
+        -------
+        (train_only, test_only, shared) : Tuple[List]
+            train(test)_only is a sorted list of playerIDs which appears only in trian(test) set.
+            shared is a sorted list of playerIDs which appears both in train and test set.
+        """
+        ids_train = set(ids_train.tolist())
+        ids_test = set(ids_test.tolist())
+        shared = ids_train & ids_test
+        train_only = ids_train - shared
+        test_only = ids_test - shared
+        return sorted(list(train_only)), sorted(list(test_only)), sorted(list(shared))
 
 
 class Hand(object):

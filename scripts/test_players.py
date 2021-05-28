@@ -54,6 +54,30 @@ class TestAssignPlayerID(unittest.TestCase):
             self.assertEqual(rows.shape[0], 2)  # 2 rows
             self.assertEqual(rows.playerID.nunique(), 1)  # only 1 ID
 
+    def test_compare_2_ids(self):
+        '''
+        From 1 to 3: Appear both in train/test set.
+        From 4 to 6: Appear only in train set.
+        From 7 to 9: Appear only int test set.
+        '''
+        ids_train = pd.Series(
+            [
+                1, 1, 1, 2, 2, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6,
+            ]
+        )
+        ids_test = pd.Series(
+            [
+                1, 2, 2, 2, 2, 3, 3, 7, 8, 9, 9, 9, 9,
+            ]
+        )
+        expected = (
+            [4, 5, 6],  # train only
+            [7, 8, 9],  # test only
+            [1, 2, 3],  # shared
+        )
+        output = PlayersID.compare_2_ids(ids_train, ids_test)
+        self.assertEqual(output, expected)
+
 
 class TestHand(unittest.TestCase):
 
