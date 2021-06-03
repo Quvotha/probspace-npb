@@ -17,4 +17,4 @@ filename,cv,train,valid,LB,Note
 "019_submission.csv","Stratified-Kfold(K=5)","0.332642","0.152007","0.11934","全特徴量を使用したCatBoost.バランス指定、カテゴリ指定"
 "020_submission.csv","Stratified-Kfold(K=5)","0.332642","0.152007","0.11934","全特徴量を使用したCatBoost.バランス指定、カテゴリ未指定"
 "021_submission.csv","Stratified-Kfold(K=5)","0.372445","0.191531","0.13536","全特徴量を使用したXGBoost.016とは異なりカテゴリ変数にダミーエンコーディングを行わない。"
-"022_submission.csv","Stratified-Kfold(K=5)","0.502940","0.207948","","全特徴量を使用したXGBoost.022との差異は fit の際に sample_weight を使うこと。"
+"022_submission.csv","Stratified-Kfold(K=5)","0.502940","0.207948","0.13054","全特徴量を使用したXGBoost.022との差異は fit の際に sample_weight を使うこと。"
