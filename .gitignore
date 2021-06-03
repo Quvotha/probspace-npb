@@ -1,3 +1,9 @@
 __pycache__
 .ipynb_checkpoints
 /read_only/
+
+/experiments/*/
+!/experiments/*/*.ipynb
+!/experiments/*.ipynb
+!/experiments/submissions.csv
+!/experiments/features.py
