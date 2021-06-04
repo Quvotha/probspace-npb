@@ -394,5 +394,6 @@ CATEGORICAL_FEATURES = [
     'isBatterPitcher',
     'isBottom',
     'batterTeam',
-    'pitcherTeam'
+    'pitcherTeam',
+    'b1', 'b2', 'b3'
 ]
